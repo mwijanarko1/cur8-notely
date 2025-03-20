@@ -16,23 +16,23 @@ const geistMono = Geist_Mono({
 
 // Define metadata for better SEO
 export const metadata: Metadata = {
-  title: "Cursor Website Building Guide",
-  description: "A step-by-step guide to creating websites using Cursor's AI-powered features",
-  keywords: ["Cursor", "Website", "Guide", "AI", "Coding", "Web Development"],
-  authors: [{ name: "Cursor Guide Team" }],
-  creator: "Cursor Guide",
-  publisher: "Cursor Guide",
+  title: "Next.js Beginner Template",
+  description: "A beginner-friendly Next.js template with TailwindCSS and TypeScript",
+  keywords: ["Next.js", "React", "TailwindCSS", "TypeScript", "Template"],
+  authors: [{ name: "Created with Cursor Agent" }],
+  creator: "Cursor Agent",
+  publisher: "Cursor Agent",
   openGraph: {
-    title: "Cursor Website Building Guide",
-    description: "A step-by-step guide to creating websites using Cursor's AI-powered features",
-    url: "https://cursor.sh/",
-    siteName: "Cursor Website Building Guide",
+    title: "Next.js Beginner Template",
+    description: "A beginner-friendly Next.js template with TailwindCSS and TypeScript",
+    url: "https://nextjs.org/",
+    siteName: "Next.js Beginner Template",
     images: [
       {
-        url: "/images/og-image.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Cursor Website Building Guide",
+        alt: "Next.js Beginner Template",
       },
     ],
     locale: "en_US",
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cursor Website Building Guide",
-    description: "A step-by-step guide to creating websites using Cursor's AI-powered features",
-    images: ["/images/og-image.png"],
+    title: "Next.js Beginner Template",
+    description: "A beginner-friendly Next.js template with TailwindCSS and TypeScript",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
