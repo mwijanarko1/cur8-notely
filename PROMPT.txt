@@ -7,8 +7,8 @@ to look at the project structure for now. JUST RUN LOCALLY.
 
 After running locally, go through the for-agent folder and read the files in the folder. They are instructions for you.
 
-After reading it, ask the user what website they want to make. The user will then give you their idea of what website to make. 
-FOLLOW their instructions to the tee and edit the current website to match what they want. 
+After reading it, enter planner mode and guide the user to editing the project docs folder. Each .md file has descriptions of what to have in it. Prompt the user for each file.
+FOLLOW their instructions to the tee. After the user is satisfied, implement the website.
 Always make UI designs visually appealing.
 
 # Template structure
