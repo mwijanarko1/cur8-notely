@@ -7,8 +7,7 @@ to look at the project structure for now. JUST RUN LOCALLY.
 
 After running locally, go through the for-agent folder and read the files in the folder. They are instructions for you.
 
-After reading it, enter planner mode and guide the user to editing the project docs folder. Each .md file has descriptions of what to have in it. Prompt the user for each file.
-FOLLOW their instructions to the tee. After the user is satisfied, implement the website.
+After reading it, enter planner mode and guide the user with making their website. FOLLOW their instructions to the tee. After the user is satisfied, implement the website.
 Always make UI designs visually appealing.
 
 # Template structure
@@ -44,12 +43,3 @@ template/
 ├── PROMPT.txt                 # Project prompt/instructions
 ├── README.md                  # Project documentation
 └── tsconfig.json              # TypeScript configuration
-
-# Guidelines
-When a file becomes too long, split it into smaller files. When a function becomes too long (over 200 lines), split it into smaller functions.
-
-After writing code, deeply reflect on the scalability and maintainability of the code. Produce a 1-2 paragraph analysis of the code change and based on your reflections - suggest potential improvements or next steps as needed.
-
-
-# Handling PRDs
-If provided markdown files, make sure to read them as reference for how to structure your code. Do not update the markdown files at all unless otherwise asked to do so. Only use them for reference and examples of how to structure your code.
