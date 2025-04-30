@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/hooks/useAuth";
+import FirebaseInitializer from "@/components/FirebaseInitializer";
 
 // Initialize the Geist font with Latin subset
 const geistSans = Geist({
@@ -16,23 +18,23 @@ const geistMono = Geist_Mono({
 
 // Define metadata for better SEO
 export const metadata: Metadata = {
-  title: "Next.js Beginner Template",
-  description: "A beginner-friendly Next.js template with TailwindCSS and TypeScript",
-  keywords: ["Next.js", "React", "TailwindCSS", "TypeScript", "Template"],
-  authors: [{ name: "Created with Cursor Agent" }],
-  creator: "Cursor Agent",
-  publisher: "Cursor Agent",
+  title: "Cur8 Notely - Simple & Secure Note-Taking",
+  description: "A secure note-taking application with user authentication",
+  keywords: ["Notes", "Security", "Authentication", "Firebase", "Next.js"],
+  authors: [{ name: "Built by @mikhailbuilds" }],
+  creator: "Built by @mikhailbuilds",
+  publisher: "Cur8 Notely",
   openGraph: {
-    title: "Next.js Beginner Template",
-    description: "A beginner-friendly Next.js template with TailwindCSS and TypeScript",
-    url: "https://nextjs.org/",
-    siteName: "Next.js Beginner Template",
+    title: "Cur8 Notely - Simple & Secure Note-Taking",
+    description: "A secure note-taking application with user authentication",
+    url: "https://cur8-notely.example.com/",
+    siteName: "Cur8 Notely",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Next.js Beginner Template",
+        alt: "Cur8 Notely",
       },
     ],
     locale: "en_US",
@@ -40,8 +42,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Next.js Beginner Template",
-    description: "A beginner-friendly Next.js template with TailwindCSS and TypeScript",
+    title: "Cur8 Notely - Simple & Secure Note-Taking",
+    description: "A secure note-taking application with user authentication",
     images: ["/og-image.png"],
   },
   robots: {
@@ -58,9 +60,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}
       >
-        {children}
+        <FirebaseInitializer />
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
