@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { initializeFirebase } from '@/lib/firebase/init';
+import { TOKEN_EXPIRATION } from '@/lib/firebase/firebase';
+import { setupActivityListeners } from '@/lib/firebase/tokenManager';
 
 export default function FirebaseInitializer() {
   const [initialized, setInitialized] = useState(false);
@@ -12,6 +14,11 @@ export default function FirebaseInitializer() {
       try {
         await initializeFirebase();
         console.log('Firebase initialized successfully');
+        
+        // Setup activity tracking for token expiration
+        setupActivityListeners();
+        console.log(`Session will expire after ${TOKEN_EXPIRATION / 1000} seconds of inactivity`);
+        
         setInitialized(true);
         setError(null);
       } catch (error) {

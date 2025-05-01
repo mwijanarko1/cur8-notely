@@ -136,4 +136,39 @@ export const deleteNote = async (user: User, noteId: string): Promise<void> => {
 
   const noteRef = doc(db, NOTES_COLLECTION, noteId);
   return deleteDoc(noteRef);
+};
+
+// Create a welcome note for new users
+export const createWelcomeNote = async (user: User): Promise<DocumentReference> => {
+  if (!user) {
+    throw new Error('User must be authenticated to create welcome note');
+  }
+
+  const welcomeTitle = 'Welcome to Notely!';
+  const welcomeContent = `Welcome to Notely! 🎉
+
+Thank you for signing up! Notely is a simple, secure note-taking application built with privacy and ease of use in mind.
+
+Features:
+• Secure Authentication: Your notes are protected with Firebase Authentication
+• Real-time Sync: All your notes are synchronized in real-time
+• Fast & Responsive: Built with Next.js for optimal performance
+• Session Management: Your session automatically expires after 15 minutes of inactivity for security
+
+Getting Started:
+1. Click the "+" button in the sidebar to create a new note
+2. Give your note a title and start writing
+3. Your changes are saved automatically as you type
+4. Use the search function to quickly find your notes
+
+About the Developer:
+This application was built by Mikhail Wijanarko (https://mikhailwijanarko.xyz).
+Check out more projects on GitHub: https://github.com/mikhailw
+
+Enjoy using Notely for all your note-taking needs!`;
+
+  return createNote(user, {
+    title: welcomeTitle,
+    content: welcomeContent
+  });
 }; 

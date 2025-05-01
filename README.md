@@ -1,12 +1,14 @@
 # Cur8 Notely
 
-A secure note-taking application with user authentication built with Next.js and Firebase. Built by [@mikhailbuilds](https://twitter.com/mikhailbuilds).
+A secure note-taking application with user authentication built with Next.js and Firebase. Built by [@mikhailbuilds](https://mikhailwijanarko.xyz).
 
 ## Features
 
 - **User Authentication**: Secure login and registration using Firebase Authentication
+- **Session Management**: 15-minute session expiration with activity tracking and auto-logout
 - **Note Management**: Create, read, update, and delete personal notes
 - **Real-time Updates**: Notes are updated in real-time using Firestore
+- **AI Assistant**: Ask questions about your notes using the built-in AI chat assistant
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Search Functionality**: Quickly find notes with the built-in search feature
 
@@ -16,6 +18,7 @@ A secure note-taking application with user authentication built with Next.js and
 - **Backend**: Firebase (Authentication, Firestore)
 - **Form Handling**: React Hook Form with Zod validation
 - **Styling**: TailwindCSS for responsive design
+- **AI Integration**: Google Gemini API
 - **Icons**: React Icons
 
 ## Getting Started
@@ -23,6 +26,8 @@ A secure note-taking application with user authentication built with Next.js and
 ### Prerequisites
 
 - Node.js 18+ and npm
+- Firebase account
+- Google Gemini API key (for AI assistant features)
 
 ### Installation
 
@@ -37,7 +42,7 @@ A secure note-taking application with user authentication built with Next.js and
    npm install
    ```
 
-3. Create a `.env.local` file in the root directory with your Firebase configuration:
+3. Create a `.env.local` file in the root directory with your Firebase and Gemini API configuration:
    ```
    NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
@@ -59,7 +64,29 @@ A secure note-taking application with user authentication built with Next.js and
 
 1. Create a new Firebase project in the [Firebase Console](https://console.firebase.google.com/)
 2. Enable Authentication and Firestore services
-3. Set up Firestore rules to secure user data
+3. Set up Authentication methods:
+   - Email/Password authentication
+   - Google authentication (optional)
+4. Deploy Firestore security rules using the included `firestore.rules` file:
+   ```bash
+   firebase deploy --only firestore:rules
+   ```
+
+## Authentication and Session Management
+
+The application implements a 15-minute session expiration mechanism as specified in the requirements:
+
+- Sessions automatically expire after 15 minutes of inactivity
+- User activity (mouse movement, keyboard input, etc.) resets the inactivity timer
+- A warning appears 2 minutes before session expiration
+- Users can manually extend their session by clicking the "Extend Session" button
+- API requests and note interactions automatically reset the session timer
+
+The session expiration implements these security best practices:
+1. Activity-based expiration rather than a fixed timeout
+2. Client-side activity monitoring
+3. Browser session persistence (session cleared on browser close)
+4. User-friendly warnings and session extension
 
 ## Hardcoded User Credentials
 
@@ -75,6 +102,7 @@ This user is automatically created in Firebase when the application initializes.
 ```
 src/
 ├── app/                      # Next.js App Router
+│   ├── api/                  # API routes for Gemini integration
 │   ├── login/                # Login page
 │   ├── notes/                # Notes page (protected)
 │   ├── register/             # Registration page
@@ -84,16 +112,56 @@ src/
 ├── components/               # React components
 │   ├── auth/                 # Authentication components
 │   ├── notes/                # Note-related components
-│   └── ui/                   # Reusable UI components
+│   ├── ui/                   # Reusable UI components
+│   ├── FirebaseInitializer.tsx # Firebase setup component
+│   ├── Hero.tsx              # Landing page hero section
+│   └── Navbar.tsx            # Navigation with session expiration warning
 ├── hooks/                    # Custom React hooks
-│   ├── useAuth.tsx           # Authentication hook
+│   ├── useAuth.tsx           # Authentication hook with session management
 │   └── useNotes.tsx          # Notes management hook
 ├── lib/                      # Library code
 │   └── firebase/             # Firebase configuration and services
+│       ├── auth.ts           # Authentication functions
+│       ├── firebase.ts       # Firebase initialization
+│       ├── init.ts           # Application initialization
+│       ├── notes.ts          # Notes CRUD operations
+│       └── tokenManager.ts   # Session expiration management
 ├── types/                    # TypeScript type definitions
 └── utils/                    # Utility functions and helpers
     └── validations.ts        # Form validation schemas
 ```
+
+## Testing
+
+The application includes automated tests to verify key functionality:
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test files
+npm test -- -t "authentication"
+
+# Run tests with coverage
+npm test -- --coverage
+```
+
+### Test Structure
+
+- **Unit Tests**: Tests for individual components and utility functions
+- **Integration Tests**: Tests for authentication flows and note operations
+- **Component Tests**: Tests for UI components and their interactions
+
+### Manual Testing
+
+You can manually test the session expiration by:
+
+1. Logging in with test credentials
+2. Waiting for ~13 minutes without interaction
+3. Observing the session expiration warning
+4. Waiting another 2 minutes to see the auto-logout
 
 ## Deployment
 
@@ -104,23 +172,20 @@ The application can be deployed to Vercel:
 3. Add your environment variables
 4. Deploy!
 
-## Testing
-
-Run the tests with:
-
-```bash
-npm test
-```
-
-## Trade-offs and Future Improvements
+## Trade-offs and Production Improvements
 
 With more time, the following improvements could be made:
 
-1. **Comprehensive Testing**: Add comprehensive unit and integration tests
-2. **Advanced Note Features**: Add rich text editing, tagging, and categories
-3. **Offline Support**: Implement offline capabilities with service workers
-4. **Multi-user Collaboration**: Allow sharing and collaboration on notes
-5. **End-to-End Encryption**: Implement client-side encryption for maximum security
+1. **Server-Side Session Management**: Implement server-side session validation in addition to client-side
+2. **Refresh Tokens**: Use Firebase refresh tokens for more secure session management
+3. **Comprehensive Testing**: Add comprehensive unit and integration tests with higher coverage
+4. **Advanced Note Features**: Add rich text editing, tagging, and categories
+5. **Offline Support**: Implement offline capabilities with service workers
+6. **Multi-user Collaboration**: Allow sharing and collaboration on notes
+7. **End-to-End Encryption**: Implement client-side encryption for maximum security
+8. **Rate Limiting**: Add API rate limiting to prevent abuse
+9. **Password Policies**: Enforce stronger password requirements
+10. **CAPTCHA Integration**: Add CAPTCHA to prevent automated attacks
 
 ## License
 

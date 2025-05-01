@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "Cur8 Notely - Simple & Secure Note-Taking",
   description: "A secure note-taking application with user authentication",
   keywords: ["Notes", "Security", "Authentication", "Firebase", "Next.js"],
-  authors: [{ name: "Built by @mikhailbuilds" }],
+  authors: [{ name: "Built by @mikhailbuilds", url: "https://mikhailwijanarko.xyz" }],
   creator: "Built by @mikhailbuilds",
   publisher: "Cur8 Notely",
   openGraph: {

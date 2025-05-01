@@ -158,7 +158,7 @@ export default function Home() {
               &copy; {new Date().getFullYear()} Cur8 Notely. All rights reserved.
             </p>
             <p className="mt-1 text-sm text-gray-500">
-              Built by <a href="https://twitter.com/mikhailbuilds" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">@mikhailbuilds</a>
+              Built by <a href="https://mikhailwijanarko.xyz" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">@mikhailbuilds</a>
             </p>
           </div>
         </div>

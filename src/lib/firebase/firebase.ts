@@ -1,6 +1,6 @@
 // Import Firebase modules
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
@@ -20,6 +20,16 @@ let firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getAp
 
 // Initialize Firebase services
 const auth = getAuth(firebaseApp);
+
+// Set session persistence to browser session only
+// This ensures the session is cleared when the browser is closed
+if (typeof window !== 'undefined') {
+  setPersistence(auth, browserSessionPersistence)
+    .catch(error => {
+      console.error('Error setting auth persistence:', error);
+    });
+}
+
 const db = getFirestore(firebaseApp);
 
 // Initialize analytics conditionally (only in browser environment)
@@ -28,5 +38,8 @@ if (typeof window !== 'undefined') {
   // We're in the browser
   isSupported().then(yes => yes && (analytics = getAnalytics(firebaseApp)));
 }
+
+// Token expiration duration in milliseconds (15 minutes)
+export const TOKEN_EXPIRATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 
 export { firebaseApp, auth, db, analytics }; 

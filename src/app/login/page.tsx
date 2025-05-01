@@ -189,8 +189,8 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="mt-4 text-sm text-center text-gray-500">
-        <p>Built by <a href="https://twitter.com/mikhailbuilds" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500">@mikhailbuilds</a></p>
+      <div className="mt-4 text-center text-sm text-gray-500">
+        <p>Built by <a href="https://mikhailwijanarko.xyz" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500">@mikhailbuilds</a></p>
       </div>
     </div>
   );
