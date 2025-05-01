@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   serverRuntimeConfig: {
     // Will only be available on the server side
-    geminiApiKey: 'AIzaSyBUQdgYQG4zdJ7vUlZcFjH1oKdTzi6E8yY',
+    geminiApiKey: process.env.GEMINI_API_KEY || '',
   },
   publicRuntimeConfig: {
     // Will be available on both server and client

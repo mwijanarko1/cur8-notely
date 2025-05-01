@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getServerRuntimeConfig } from '@/lib/utils/config';
 
-// Initialize the Google Generative AI client with API key
-const apiKey = 'AIzaSyBUQdgYQG4zdJ7vUlZcFjH1oKdTzi6E8yY';
+// Initialize the Google Generative AI client with API key from server config
+const serverConfig = getServerRuntimeConfig();
+const apiKey = serverConfig.geminiApiKey;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(request: NextRequest) {

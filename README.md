@@ -44,6 +44,7 @@ A secure note-taking application with user authentication built with Next.js and
 
 3. Create a `.env.local` file in the root directory with your Firebase and Gemini API configuration:
    ```
+   # Firebase Configuration
    NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
@@ -51,6 +52,9 @@ A secure note-taking application with user authentication built with Next.js and
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
    NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your-measurement-id
+   
+   # Google Gemini API
+   GEMINI_API_KEY=your-gemini-api-key
    ```
 
 4. Start the development server:
@@ -190,3 +194,13 @@ With more time, the following improvements could be made:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+### Security Best Practices
+
+This application implements several security best practices:
+
+1. **Environment Variables**: All API keys and sensitive configuration values are stored in environment variables and accessed securely.
+2. **Server-Only API Keys**: The Gemini API key is only used on the server side and never exposed to the client.
+3. **Firebase Security Rules**: Firestore security rules ensure users can only access their own data.
+4. **Authentication**: Firebase Authentication handles secure user management.
+5. **Session Management**: Automatic session expiration provides additional security.
