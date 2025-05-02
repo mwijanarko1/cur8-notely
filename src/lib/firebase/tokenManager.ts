@@ -6,11 +6,19 @@ import { signOut } from './auth';
 let lastActivityTimestamp = Date.now();
 let tokenExpiryTimer: NodeJS.Timeout | null = null;
 
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
 /**
  * Start the token expiry timer for the user
  * Signs out the user after 15 minutes of inactivity
  */
 export const startTokenExpiryTimer = (user: User | null) => {
+  // Skip if not in browser or auth not initialized
+  if (!isBrowser || !auth) {
+    return;
+  }
+
   // Clear any existing timer
   if (tokenExpiryTimer) {
     clearTimeout(tokenExpiryTimer);
@@ -47,6 +55,10 @@ export const startTokenExpiryTimer = (user: User | null) => {
  * Stop the token expiry timer
  */
 export const stopTokenExpiryTimer = () => {
+  if (!isBrowser) {
+    return;
+  }
+
   if (tokenExpiryTimer) {
     clearInterval(tokenExpiryTimer);
     tokenExpiryTimer = null;
@@ -59,6 +71,10 @@ export const stopTokenExpiryTimer = () => {
  * This should be called whenever the user interacts with the app
  */
 export const updateLastActivity = () => {
+  if (!isBrowser) {
+    return;
+  }
+
   lastActivityTimestamp = Date.now();
   console.log('Last activity timestamp updated');
 };
@@ -67,22 +83,26 @@ export const updateLastActivity = () => {
  * Setup user activity listeners to track when the user is active
  */
 export const setupActivityListeners = () => {
-  if (typeof window !== 'undefined') {
-    const events = ['mousedown', 'keydown', 'touchstart', 'scroll'];
-    
-    events.forEach(event => {
-      window.addEventListener(event, () => updateLastActivity(), { passive: true });
-    });
-    
-    console.log('User activity listeners set up');
+  if (!isBrowser) {
+    return;
   }
+
+  const events = ['mousedown', 'keydown', 'touchstart', 'scroll'];
+  
+  events.forEach(event => {
+    window.addEventListener(event, () => updateLastActivity(), { passive: true });
+  });
+  
+  console.log('User activity listeners set up');
 };
 
 /**
  * Get the expiry time for the current session
  */
 export const getSessionExpiryTime = (): Date | null => {
-  if (!lastActivityTimestamp) return null;
+  if (!isBrowser || !lastActivityTimestamp) {
+    return null;
+  }
   
   const expiryTime = new Date(lastActivityTimestamp + TOKEN_EXPIRATION);
   return expiryTime;
@@ -92,6 +112,10 @@ export const getSessionExpiryTime = (): Date | null => {
  * Check if the user's token is going to expire soon (within 2 minutes)
  */
 export const isTokenExpiringSoon = (): boolean => {
+  if (!isBrowser) {
+    return false;
+  }
+
   const currentTime = Date.now();
   const timeSinceLastActivity = currentTime - lastActivityTimestamp;
   

@@ -17,6 +17,18 @@ const HARDCODED_USER = {
  * This should be called once during app startup
  */
 export const initializeFirebase = async () => {
+  // Skip initialization if running on server (during build or SSR)
+  if (typeof window === 'undefined') {
+    console.log('Skipping Firebase initialization on server');
+    return;
+  }
+
+  // Skip if Firebase auth isn't properly initialized
+  if (!auth) {
+    console.warn('Firebase auth not initialized, skipping user setup');
+    return;
+  }
+
   try {
     // Try to sign in with the hardcoded credentials
     await signInWithEmailAndPassword(auth, HARDCODED_USER.email, HARDCODED_USER.password);
@@ -45,7 +57,9 @@ export const initializeFirebase = async () => {
   } finally {
     // Sign out to clear the auth state
     try {
-      await auth.signOut();
+      if (auth) {
+        await auth.signOut();
+      }
     } catch (signOutError) {
       console.error('Error signing out after initialization:', signOutError);
     }
