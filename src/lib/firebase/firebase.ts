@@ -36,6 +36,22 @@ let auth: Auth | null = null;
 let db: Firestore | null = null;
 let analytics: Analytics | null = null;
 
+// Function to check if auth is initialized
+export function getAuthInstance(): Auth {
+  if (!auth) {
+    throw new Error('Firebase auth is not initialized');
+  }
+  return auth;
+}
+
+// Function to check if Firestore is initialized
+export function getFirestoreInstance(): Firestore {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
+  return db;
+}
+
 // Only initialize Firebase in browser environment
 if (isBrowser) {
   // Initialize Firebase only if it hasn't been initialized already

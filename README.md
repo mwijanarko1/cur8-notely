@@ -33,7 +33,7 @@ A secure note-taking application with user authentication built with Next.js and
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/cur8-notely.git
+   git clone https://github.com/mwijanarko1/cur8-notely.git
    cd cur8-notely
    ```
 

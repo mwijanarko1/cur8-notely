@@ -16,7 +16,7 @@ import {
   onSnapshot,
   Unsubscribe,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, getFirestoreInstance } from './firebase';
 import { User } from 'firebase/auth';
 
 // Collection name
@@ -41,7 +41,8 @@ export const createNote = async (
     throw new Error('User must be authenticated to create notes');
   }
 
-  return addDoc(collection(db, NOTES_COLLECTION), {
+  const firestore = getFirestoreInstance();
+  return addDoc(collection(firestore, NOTES_COLLECTION), {
     ...data,
     userId: user.uid,
     createdAt: serverTimestamp(),
@@ -55,8 +56,9 @@ export const getNotes = async (user: User): Promise<Note[]> => {
     throw new Error('User must be authenticated to fetch notes');
   }
 
+  const firestore = getFirestoreInstance();
   const q = query(
-    collection(db, NOTES_COLLECTION),
+    collection(firestore, NOTES_COLLECTION),
     where('userId', '==', user.uid),
     orderBy('updatedAt', 'desc')
   );
@@ -88,27 +90,34 @@ export const subscribeToNotes = (
     throw new Error('User must be authenticated to subscribe to notes');
   }
 
-  const q = query(
-    collection(db, NOTES_COLLECTION),
-    where('userId', '==', user.uid),
-    orderBy('updatedAt', 'desc')
-  );
+  try {
+    const firestore = getFirestoreInstance();
+    const q = query(
+      collection(firestore, NOTES_COLLECTION),
+      where('userId', '==', user.uid),
+      orderBy('updatedAt', 'desc')
+    );
 
-  return onSnapshot(q, (querySnapshot) => {
-    const notes: Note[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      notes.push({
-        id: doc.id,
-        title: data.title,
-        content: data.content,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-        userId: data.userId,
+    return onSnapshot(q, (querySnapshot) => {
+      const notes: Note[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        notes.push({
+          id: doc.id,
+          title: data.title,
+          content: data.content,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+          userId: data.userId,
+        });
       });
+      callback(notes);
     });
-    callback(notes);
-  });
+  } catch (error) {
+    console.error('Error subscribing to notes:', error);
+    // Return a no-op unsubscribe function
+    return () => {};
+  }
 };
 
 // Update a note
@@ -121,7 +130,8 @@ export const updateNote = async (
     throw new Error('User must be authenticated to update notes');
   }
 
-  const noteRef = doc(db, NOTES_COLLECTION, noteId);
+  const firestore = getFirestoreInstance();
+  const noteRef = doc(firestore, NOTES_COLLECTION, noteId);
   return updateDoc(noteRef, {
     ...data,
     updatedAt: serverTimestamp(),
@@ -134,7 +144,8 @@ export const deleteNote = async (user: User, noteId: string): Promise<void> => {
     throw new Error('User must be authenticated to delete notes');
   }
 
-  const noteRef = doc(db, NOTES_COLLECTION, noteId);
+  const firestore = getFirestoreInstance();
+  const noteRef = doc(firestore, NOTES_COLLECTION, noteId);
   return deleteDoc(noteRef);
 };
 

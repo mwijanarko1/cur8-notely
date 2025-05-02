@@ -8,7 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
-import { auth } from './firebase';
+import { auth, getAuthInstance } from './firebase';
 
 // Hardcoded user as required in the PRD
 const HARDCODED_USER = {
@@ -24,7 +24,7 @@ const googleProvider = new GoogleAuthProvider();
  */
 export const registerUser = async (email: string, password: string): Promise<UserCredential> => {
   try {
-    return await createUserWithEmailAndPassword(auth, email, password);
+    return await createUserWithEmailAndPassword(getAuthInstance(), email, password);
   } catch (error) {
     console.error('Error registering user:', error);
     throw error;
@@ -36,21 +36,23 @@ export const registerUser = async (email: string, password: string): Promise<Use
  * Includes special handling for the hardcoded user from the PRD
  */
 export const signIn = async (email: string, password: string): Promise<UserCredential> => {
+  const authInstance = getAuthInstance();
+  
   try {
     // Handle hardcoded user case
     if (email === 'intern' && password === 'letmein') {
       // Use the actual Firebase account for the hardcoded user
       try {
-        return await signInWithEmailAndPassword(auth, HARDCODED_USER.email, HARDCODED_USER.password);
+        return await signInWithEmailAndPassword(authInstance, HARDCODED_USER.email, HARDCODED_USER.password);
       } catch (error) {
         console.error('Error signing in with hardcoded user:', error);
         // If hardcoded user sign-in fails, try to create it
         try {
-          return await createUserWithEmailAndPassword(auth, HARDCODED_USER.email, HARDCODED_USER.password);
+          return await createUserWithEmailAndPassword(authInstance, HARDCODED_USER.email, HARDCODED_USER.password);
         } catch (createError: any) {
           // If it fails because user already exists, try signing in again
           if (createError.code === 'auth/email-already-in-use') {
-            return await signInWithEmailAndPassword(auth, HARDCODED_USER.email, HARDCODED_USER.password);
+            return await signInWithEmailAndPassword(authInstance, HARDCODED_USER.email, HARDCODED_USER.password);
           }
           throw createError;
         }
@@ -58,7 +60,7 @@ export const signIn = async (email: string, password: string): Promise<UserCrede
     }
     
     // Regular sign in
-    return await signInWithEmailAndPassword(auth, email, password);
+    return await signInWithEmailAndPassword(authInstance, email, password);
   } catch (error) {
     console.error('Error signing in:', error);
     throw error;
@@ -70,7 +72,7 @@ export const signIn = async (email: string, password: string): Promise<UserCrede
  */
 export const signInWithGoogle = async (): Promise<UserCredential> => {
   try {
-    return await signInWithPopup(auth, googleProvider);
+    return await signInWithPopup(getAuthInstance(), googleProvider);
   } catch (error) {
     console.error('Error signing in with Google:', error);
     throw error;
@@ -82,7 +84,7 @@ export const signInWithGoogle = async (): Promise<UserCredential> => {
  */
 export const signOut = async (): Promise<void> => {
   try {
-    await firebaseSignOut(auth);
+    await firebaseSignOut(getAuthInstance());
   } catch (error) {
     console.error('Error signing out:', error);
     throw error;
@@ -93,17 +95,37 @@ export const signOut = async (): Promise<void> => {
  * Get the current authenticated user
  */
 export const getCurrentUser = (): Promise<User | null> => {
-  return new Promise((resolve) => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      unsubscribe();
-      resolve(user);
+  try {
+    const authInstance = getAuthInstance();
+    return new Promise((resolve) => {
+      const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+        unsubscribe();
+        resolve(user);
+      });
     });
-  });
+  } catch (error) {
+    console.warn('Auth not initialized in getCurrentUser');
+    return Promise.resolve(null);
+  }
 };
 
 /**
  * Subscribe to auth state changes
  */
 export const onAuthChange = (callback: (user: User | null) => void) => {
-  return onAuthStateChanged(auth, callback);
+  if (!auth) {
+    callback(null);
+    return () => {};
+  }
+  
+  try {
+    // Try to use the getAuthInstance which guarantees a non-null Auth
+    const authInstance = getAuthInstance();
+    return onAuthStateChanged(authInstance, callback);
+  } catch (error) {
+    // Fall back to handling null case if getAuthInstance throws
+    console.warn('Auth not initialized, using fallback for onAuthChange');
+    callback(null);
+    return () => {};
+  }
 }; 
