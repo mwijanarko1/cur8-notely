@@ -27,6 +27,20 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || DEFAULT_CONFIG.measurementId,
 };
 
+// Check if using real config or fallback
+const isUsingRealConfig = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+
+// Log configuration status (without exposing actual keys)
+console.log('Firebase config status:', {
+  usingRealConfig: isUsingRealConfig,
+  apiKeyProvided: !!firebaseConfig.apiKey,
+  authDomainProvided: !!firebaseConfig.authDomain,
+  projectIdProvided: !!firebaseConfig.projectId,
+  apiKeyLength: firebaseConfig.apiKey ? firebaseConfig.apiKey.length : 0,
+  environment: process.env.NODE_ENV,
+  isVercel: !!process.env.VERCEL
+});
+
 // Check if we're in a browser environment
 const isBrowser = typeof window !== 'undefined';
 
@@ -139,4 +153,18 @@ if (isBrowser) {
 // Token expiration duration in milliseconds (15 minutes)
 export const TOKEN_EXPIRATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 
-export { firebaseApp, auth, db, analytics }; 
+export { firebaseApp, auth, db, analytics };
+
+/**
+ * Check if Firebase is properly configured with valid API keys
+ * This can be used to disable features that would fail with demo keys
+ */
+export function isFirebaseProperlyConfigured(): boolean {
+  const hasRealApiKey = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY && 
+                       !process.env.NEXT_PUBLIC_FIREBASE_API_KEY.includes('demo-key');
+  
+  const hasRealAuthDomain = !!process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN && 
+                           !process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN.includes('demo-app');
+  
+  return hasRealApiKey && hasRealAuthDomain;
+} 

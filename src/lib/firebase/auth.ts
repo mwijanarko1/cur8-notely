@@ -69,18 +69,56 @@ export const signIn = async (email: string, password: string): Promise<UserCrede
 
 /**
  * Sign in with Google using a popup
+ * This must be called directly from a user interaction (like a button click)
  */
 export const signInWithGoogle = async (): Promise<UserCredential> => {
   try {
+    // Check if Firebase is properly configured first
     const authInstance = getAuthInstance();
+    
+    // Configure the Google provider
+    googleProvider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    
+    // Log auth attempt
+    console.log('Attempting Google sign-in, auth instance available:', !!authInstance);
+    
+    // Verify API key validity before proceeding
+    const firebaseConfig = {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    };
+    
+    // Check if we have a real API key or using the fallback demo key
+    if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes('demo-key')) {
+      console.error('Google sign-in aborted: Using demo API key - not valid for authentication');
+      throw new Error(
+        'Firebase is not properly configured. Please set up valid Firebase credentials. ' +
+        'If you are the developer, check your environment variables.'
+      );
+    }
+    
+    // Proceed with popup authentication
+    console.log('Proceeding with Google sign-in popup');
     return await signInWithPopup(authInstance, googleProvider);
   } catch (error: any) {
+    // Check for popup blocked error
+    if (error.message?.includes('popup') || error.name === 'PopupBlockedError') {
+      console.error('Google sign-in popup was blocked:', error);
+      throw new Error(
+        'The login popup was blocked by your browser. Please allow popups for this site or try again.'
+      );
+    }
+    
     // Handle API key errors more gracefully
     if (error.code?.includes('api-key') || 
         error.code?.includes('invalid-argument') || 
         error.code?.includes('invalid-api-key')) {
       console.error('Google sign-in failed due to invalid Firebase configuration:', error);
-      throw new Error('Authentication service is currently unavailable. Please try again later or use email/password login.');
+      throw new Error(
+        'Authentication service is currently unavailable. Please try again later or use email/password login.'
+      );
     }
     
     // Handle other authentication errors

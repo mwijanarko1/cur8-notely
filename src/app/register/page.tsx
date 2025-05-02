@@ -1,18 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FiMail, FiLock, FiAlertCircle, FiArrowLeft } from 'react-icons/fi';
+import { FiMail, FiLock, FiAlertCircle, FiArrowLeft, FiInfo } from 'react-icons/fi';
 import { registerSchema } from '@/utils/validations';
 import { useAuth } from '@/hooks/useAuth';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { FirebaseError } from 'firebase/app';
 import Image from 'next/image';
+import { isFirebaseProperlyConfigured } from '@/lib/firebase/firebase';
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -20,6 +21,7 @@ export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [googleSignInEnabled, setGoogleSignInEnabled] = useState(false);
   const router = useRouter();
   const { register: registerUser, signInWithGoogle } = useAuth();
 
@@ -35,6 +37,20 @@ export default function RegisterPage() {
       confirmPassword: '',
     },
   });
+
+  // Check if Firebase is properly configured on mount
+  useEffect(() => {
+    const checkFirebaseConfig = () => {
+      const isProperlyConfigured = isFirebaseProperlyConfigured();
+      setGoogleSignInEnabled(isProperlyConfigured);
+      
+      if (!isProperlyConfigured) {
+        console.warn('Firebase is not properly configured with valid API keys. Google Sign-In is disabled.');
+      }
+    };
+    
+    checkFirebaseConfig();
+  }, []);
 
   const onSubmit = async (data: RegisterFormValues) => {
     setServerError(null);
@@ -165,12 +181,22 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {!googleSignInEnabled && (
+            <div className="my-3 p-2 bg-yellow-50 border border-yellow-100 rounded-md flex items-start text-sm text-yellow-700">
+              <FiInfo className="mr-2 mt-0.5 flex-shrink-0" />
+              <span>Google Sign-In is currently unavailable. Please use email/password registration instead.</span>
+            </div>
+          )}
+
           <div className="mt-6">
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              disabled={isGoogleLoading}
-              className="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={isGoogleLoading || !googleSignInEnabled}
+              className={`w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm 
+                ${googleSignInEnabled 
+                  ? 'bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' 
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
             >
               {isGoogleLoading ? (
                 <div className="h-5 w-5 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
