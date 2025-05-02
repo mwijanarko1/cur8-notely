@@ -4,14 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm install --legacy-peer-deps && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:required": "jest auth.test.tsx notes.test.tsx",
-    "install": "npm install --legacy-peer-deps"
+    "test:required": "jest auth.test.tsx notes.test.tsx"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
