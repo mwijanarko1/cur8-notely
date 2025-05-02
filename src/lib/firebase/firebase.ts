@@ -39,7 +39,16 @@ let analytics: Analytics | null = null;
 // Function to check if auth is initialized
 export function getAuthInstance(): Auth {
   if (!auth) {
-    throw new Error('Firebase auth is not initialized');
+    // If we're not in a browser, throw a more helpful error
+    if (!isBrowser) {
+      throw new Error('Firebase auth cannot be used on the server side');
+    }
+    // If we're in the browser but auth is still null, try to initialize it first
+    initializeFirebase();
+    // Check again after initialization attempt
+    if (!auth) {
+      throw new Error('Firebase auth initialization failed');
+    }
   }
   return auth;
 }
@@ -47,15 +56,37 @@ export function getAuthInstance(): Auth {
 // Function to check if Firestore is initialized
 export function getFirestoreInstance(): Firestore {
   if (!db) {
-    throw new Error('Firebase Firestore is not initialized');
+    // If we're not in a browser, throw a more helpful error
+    if (!isBrowser) {
+      throw new Error('Firebase Firestore cannot be used on the server side');
+    }
+    // If we're in the browser but db is still null, try to initialize it first
+    initializeFirebase();
+    // Check again after initialization attempt
+    if (!db) {
+      throw new Error('Firebase Firestore initialization failed');
+    }
   }
   return db;
 }
 
-// Only initialize Firebase in browser environment
-if (isBrowser) {
+// Initialize Firebase - can be called multiple times, will only initialize once
+export function initializeFirebase() {
+  // Skip if not in browser
+  if (!isBrowser) {
+    console.log('Skipping Firebase initialization in non-browser environment');
+    return;
+  }
+
+  // Skip if already initialized
+  if (firebaseApp && auth && db) {
+    console.log('Firebase already initialized');
+    return;
+  }
+
   // Initialize Firebase only if it hasn't been initialized already
   try {
+    console.log('Initializing Firebase...');
     firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     
     // Initialize Firebase services
@@ -63,29 +94,46 @@ if (isBrowser) {
     
     // Set session persistence to browser session only
     // This ensures the session is cleared when the browser is closed
-    setPersistence(auth, browserSessionPersistence)
-      .catch(error => {
-        console.error('Error setting auth persistence:', error);
-      });
+    if (auth) {
+      setPersistence(auth, browserSessionPersistence)
+        .catch(error => {
+          console.warn('Error setting auth persistence:', error);
+          // Continue even if persistence setting fails
+        });
+    }
     
     db = getFirestore(firebaseApp);
     
     // Initialize analytics conditionally
-    isSupported().then(yes => {
-      if (yes && firebaseApp) {
-        analytics = getAnalytics(firebaseApp);
-      }
-    });
+    if (firebaseConfig.measurementId) {
+      isSupported().then(yes => {
+        if (yes && firebaseApp) {
+          try {
+            analytics = getAnalytics(firebaseApp);
+          } catch (analyticsError) {
+            console.warn('Analytics initialization failed:', analyticsError);
+          }
+        }
+      }).catch(error => {
+        console.warn('Analytics support check failed:', error);
+      });
+    }
     
     console.log("Firebase initialized successfully in browser environment");
   } catch (error) {
     console.error("Firebase initialization error:", error);
     
-    // In development, create dummy instances for better DX
+    // In development, log warning message
     if (process.env.NODE_ENV !== 'production') {
-      console.warn("Using mock Firebase instances for development");
+      console.warn("Using demo Firebase config - some features may not work properly");
+      console.warn("Provide valid Firebase credentials in your environment variables");
     }
   }
+}
+
+// Initialize Firebase immediately in browser environments
+if (isBrowser) {
+  initializeFirebase();
 }
 
 // Token expiration duration in milliseconds (15 minutes)

@@ -72,8 +72,18 @@ export const signIn = async (email: string, password: string): Promise<UserCrede
  */
 export const signInWithGoogle = async (): Promise<UserCredential> => {
   try {
-    return await signInWithPopup(getAuthInstance(), googleProvider);
-  } catch (error) {
+    const authInstance = getAuthInstance();
+    return await signInWithPopup(authInstance, googleProvider);
+  } catch (error: any) {
+    // Handle API key errors more gracefully
+    if (error.code?.includes('api-key') || 
+        error.code?.includes('invalid-argument') || 
+        error.code?.includes('invalid-api-key')) {
+      console.error('Google sign-in failed due to invalid Firebase configuration:', error);
+      throw new Error('Authentication service is currently unavailable. Please try again later or use email/password login.');
+    }
+    
+    // Handle other authentication errors
     console.error('Error signing in with Google:', error);
     throw error;
   }

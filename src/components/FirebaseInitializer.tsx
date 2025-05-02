@@ -25,8 +25,8 @@ export default function FirebaseInitializer() {
     
     const initialize = async () => {
       try {
+        // Initialize Firebase with the hardcoded user
         await initializeFirebase();
-        console.log('Firebase initialized successfully');
         
         // Setup activity tracking for token expiration
         setupActivityListeners();
@@ -51,6 +51,9 @@ export default function FirebaseInitializer() {
           }, delay);
         } else {
           console.warn(`Firebase initialization failed after ${MAX_RETRIES} attempts. Some features may not work properly.`);
+          
+          // Mark as initialized anyway, so the app can still function with limited features
+          setInitialized(true);
         }
       }
     };
