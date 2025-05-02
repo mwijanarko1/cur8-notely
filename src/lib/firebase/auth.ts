@@ -76,31 +76,20 @@ export const signInWithGoogle = async (): Promise<UserCredential> => {
     // Check if Firebase is properly configured first
     const authInstance = getAuthInstance();
     
-    // Configure the Google provider
+    // Configure the Google provider with your production domain
     googleProvider.setCustomParameters({
-      prompt: 'select_account'
+      prompt: 'select_account',
+      // The hostname should match what's set in your Firebase console
+      // This is needed for OAuth redirects to work properly
+      auth_domain: window.location.hostname === 'localhost' 
+        ? (process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'demo-app.firebaseapp.com')
+        : window.location.hostname
     });
     
     // Log auth attempt
-    console.log('Attempting Google sign-in, auth instance available:', !!authInstance);
-    
-    // Verify API key validity before proceeding
-    const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    };
-    
-    // Check if we have a real API key or using the fallback demo key
-    if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes('demo-key')) {
-      console.error('Google sign-in aborted: Using demo API key - not valid for authentication');
-      throw new Error(
-        'Firebase is not properly configured. Please set up valid Firebase credentials. ' +
-        'If you are the developer, check your environment variables.'
-      );
-    }
+    console.log('Attempting Google sign-in, host:', window.location.hostname);
     
     // Proceed with popup authentication
-    console.log('Proceeding with Google sign-in popup');
     return await signInWithPopup(authInstance, googleProvider);
   } catch (error: any) {
     // Check for popup blocked error

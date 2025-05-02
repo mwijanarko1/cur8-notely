@@ -41,8 +41,29 @@ console.log('Firebase config status:', {
   isVercel: !!process.env.VERCEL
 });
 
+// Check if we're in a production or development environment
+const isVercel = !!process.env.VERCEL;
+const isProduction = process.env.NODE_ENV === 'production';
+
 // Check if we're in a browser environment
 const isBrowser = typeof window !== 'undefined';
+
+// Log the deployment environment
+if (isBrowser) {
+  console.log('Environment:', {
+    isVercel,
+    isProduction,
+    hostname: window.location.hostname,
+    environment: process.env.NODE_ENV
+  });
+}
+
+// Override the auth domain for Vercel deployments
+if (isVercel && isBrowser && window.location.hostname !== 'localhost') {
+  // In Vercel production, use the deployment URL as auth domain
+  firebaseConfig.authDomain = window.location.hostname;
+  console.log('Set authDomain to:', window.location.hostname);
+}
 
 // Variables to hold our Firebase instances
 let firebaseApp: FirebaseApp | null = null;
