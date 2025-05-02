@@ -163,7 +163,7 @@ Getting Started:
 
 About the Developer:
 This application was built by Mikhail Wijanarko (https://mikhailwijanarko.xyz).
-Check out more projects on GitHub: https://github.com/mikhailw
+Check out more projects on GitHub: https://github.com/mwijanarko1
 
 Enjoy using Notely for all your note-taking needs!`;
 

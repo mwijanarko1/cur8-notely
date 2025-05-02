@@ -7,6 +7,7 @@ import { Note } from '@/lib/firebase/notes';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import NotesList from '@/components/notes/NotesList';
 import NoteForm from '@/components/notes/NoteForm';
+import ShareButton from '@/components/notes/ShareButton';
 import Navbar from '@/components/Navbar';
 import ChatButton from '@/components/ui/ChatButton';
 
@@ -230,6 +231,7 @@ export default function NotesPage() {
                     className="text-2xl font-semibold text-gray-800 w-full mr-4 border-0 bg-transparent focus:outline-none focus:ring-0"
                   />
                   <div className="flex space-x-2 flex-shrink-0">
+                    <ShareButton note={selectedNote} />
                     <button 
                       onClick={() => {
                         if (window.confirm('Are you sure you want to delete this note?')) {

@@ -158,6 +158,17 @@ npm test -- --coverage
 - **Integration Tests**: Tests for authentication flows and note operations
 - **Component Tests**: Tests for UI components and their interactions
 
+The tests follow the requirements in the PRD:
+- Authentication Tests: Verify successful login with hardcoded credentials and failed login with incorrect credentials
+- Notes Functionality Tests: Verify note creation, listing, and proper access control for unauthenticated users
+
+### Mock Strategy
+
+The tests use Jest mocks to simulate Firebase services:
+- Firebase Authentication: Mocked to test login success/failure without actual Firebase calls
+- Firebase Firestore: Mocked to test note operations without a real database
+- Session Expiration: Tests verify token expiration behavior
+
 ### Manual Testing
 
 You can manually test the session expiration by:
