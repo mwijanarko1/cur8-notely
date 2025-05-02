@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm install --legacy-peer-deps && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:required": "jest auth.test.tsx notes.test.tsx"
+    "test:required": "jest auth.test.tsx notes.test.tsx",
+    "install": "npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -56,5 +57,15 @@
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
     "typescript": "^5"
+  },
+  "resolutions": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@types/react": "^19"
+  },
+  "overrides": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@types/react": "^19"
   }
 }
