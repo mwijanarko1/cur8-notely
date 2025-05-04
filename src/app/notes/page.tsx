@@ -44,7 +44,8 @@ export default function NotesPage() {
       };
       await addNote(newNote);
       
-      // Flag for the useEffect to know we want to edit the new note
+      // Instead of using subscribeToNotes directly, set a flag to find the new note in the existing notes array
+      // once it's added by the subscription in useNotes
       setNewNoteId('pending');
       resetSessionTimer(); // Reset session timer on user interaction
     } catch (error) {
@@ -111,7 +112,16 @@ export default function NotesPage() {
     }
   };
 
-  // Look for newly created note
+  // Auto-select first note when notes load and nothing is selected
+  useEffect(() => {
+    if (notes.length > 0 && !selectedNote && !isCreating && !newNoteId) {
+      const firstNote = notes[0];
+      setSelectedNote(firstNote);
+    }
+  }, [notes, selectedNote, isCreating, newNoteId]);
+
+  // Restore the useEffect for finding newly created notes, but modify it to directly set selectedNote
+  // instead of sending to the NoteForm flow
   useEffect(() => {
     if (newNoteId === 'pending' && notes.length > 0) {
       // Find the most recently created note (assumes it's the one we just added)
@@ -124,23 +134,25 @@ export default function NotesPage() {
       if (sortedNotes.length > 0) {
         const mostRecentNote = sortedNotes[0];
         if (mostRecentNote.title === 'Untitled Note' && mostRecentNote.content === '') {
-          // Set this note for editing
-          setEditingNote(mostRecentNote);
-          setIsCreating(true);
-          setSelectedNote(null);
+          // Set this note for direct editing in the main content area
+          setSelectedNote(mostRecentNote);
+          setLocalTitle(mostRecentNote.title);
+          setLocalContent(mostRecentNote.content);
+          setIsCreating(false);
+          setEditingNote(null);
           setNewNoteId(mostRecentNote.id); // Store the actual ID to avoid re-triggering
+          
+          // Focus the title input field
+          setTimeout(() => {
+            if (titleInputRef.current) {
+              titleInputRef.current.focus();
+              titleInputRef.current.select();
+            }
+          }, 100);
         }
       }
     }
   }, [notes, newNoteId]);
-
-  // Auto-select first note when notes load and nothing is selected
-  useEffect(() => {
-    if (notes.length > 0 && !selectedNote && !isCreating && !newNoteId) {
-      const firstNote = notes[0];
-      setSelectedNote(firstNote);
-    }
-  }, [notes, selectedNote, isCreating, newNoteId]);
 
   // Debounced save function to prevent too many saves
   const debouncedSave = useCallback(async () => {

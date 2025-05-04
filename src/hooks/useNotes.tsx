@@ -93,6 +93,6 @@ export function useNotes({ user }: UseNotesOptions) {
     error,
     addNote,
     editNote,
-    removeNote,
+    removeNote
   };
 } 
