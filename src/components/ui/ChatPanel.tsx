@@ -28,6 +28,7 @@ const ChatPanel = ({ notes }: ChatPanelProps) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rateLimit, setRateLimit] = useState<{ remaining: number; limit: number; resetAt: Date } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Function to format timestamp
@@ -44,6 +45,21 @@ const ChatPanel = ({ notes }: ChatPanelProps) => {
     return () => clearTimeout(timer);
   }, [messages]);
 
+  // Extract rate limit information from response headers
+  const extractRateLimitInfo = (response: Response) => {
+    const remaining = response.headers.get('X-RateLimit-Remaining');
+    const limit = response.headers.get('X-RateLimit-Limit');
+    const reset = response.headers.get('X-RateLimit-Reset');
+    
+    if (remaining && limit && reset) {
+      setRateLimit({
+        remaining: parseInt(remaining),
+        limit: parseInt(limit),
+        resetAt: new Date(parseInt(reset) * 1000)
+      });
+    }
+  };
+
   // Test the Gemini API to ensure it's working
   const testGeminiApi = async () => {
     setIsLoading(true);
@@ -51,9 +67,22 @@ const ChatPanel = ({ notes }: ChatPanelProps) => {
     
     try {
       const response = await fetch('/api/test-gemini');
+      // Extract rate limit information
+      extractRateLimitInfo(response);
       const data = await response.json();
       
       if (!response.ok) {
+        // Handle rate limiting specifically
+        if (response.status === 429) {
+          const resetDate = new Date(data.resetAt);
+          const resetInMinutes = Math.ceil((resetDate.getTime() - Date.now()) / 60000);
+          const resetMessage = resetInMinutes <= 1 
+            ? 'Please try again in a minute.' 
+            : `Please try again in ${resetInMinutes} minutes.`;
+          
+          throw new Error(`Rate limit exceeded. ${resetMessage}`);
+        }
+        
         throw new Error(data.error || 'Failed to test Gemini API');
       }
       
@@ -142,11 +171,6 @@ const ChatPanel = ({ notes }: ChatPanelProps) => {
     setIsLoading(true);
     
     try {
-      // Create context from notes
-      const notesContext = notes.map(note => 
-        `Note Title: ${note.title}\nContent: ${note.content}`
-      ).join('\n\n');
-      
       // Get response from Gemini API
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -155,13 +179,31 @@ const ChatPanel = ({ notes }: ChatPanelProps) => {
         },
         body: JSON.stringify({
           message: inputValue,
-          notes: notesContext,
+          notes: {
+            currentNote: notes.map(note => 
+              `Note Title: ${note.title}\nContent: ${note.content}`
+            ).join('\n\n')
+          },
         }),
       });
       
+      // Extract rate limit information
+      extractRateLimitInfo(response);
+
       const data = await response.json();
       
       if (!response.ok) {
+        // Handle rate limiting specifically
+        if (response.status === 429) {
+          const resetDate = new Date(data.resetAt);
+          const resetInMinutes = Math.ceil((resetDate.getTime() - Date.now()) / 60000);
+          const resetMessage = resetInMinutes <= 1 
+            ? 'Please try again in a minute.' 
+            : `Please try again in ${resetInMinutes} minutes.`;
+          
+          throw new Error(`Rate limit exceeded. ${resetMessage}`);
+        }
+        
         throw new Error(data.error || 'Failed to get response from AI');
       }
       
@@ -248,6 +290,20 @@ const ChatPanel = ({ notes }: ChatPanelProps) => {
           >
             Test API Connection
           </button>
+        </div>
+      )}
+
+      {/* Rate Limit Info */}
+      {rateLimit && (
+        <div className="px-3 py-1 bg-gray-50 text-gray-500 text-xs flex justify-between items-center">
+          <span>
+            {rateLimit.remaining} of {rateLimit.limit} requests remaining
+          </span>
+          {rateLimit.remaining < 5 && (
+            <span>
+              Resets in {Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 60000)} min
+            </span>
+          )}
         </div>
       )}
 
