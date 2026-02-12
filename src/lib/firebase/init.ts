@@ -23,7 +23,6 @@ let retryCount = 0;
 export const initializeFirebase = async () => {
   // Skip initialization if running on server (during build or SSR)
   if (typeof window === 'undefined') {
-    console.log('Skipping Firebase initialization on server');
     return;
   }
 
@@ -40,7 +39,6 @@ export const initializeFirebase = async () => {
     try {
       // Try to sign in with the hardcoded credentials
       await signInWithEmailAndPassword(authInstance, HARDCODED_USER.email, HARDCODED_USER.password);
-      console.log('Hardcoded user already exists and authenticated successfully');
       retryCount = 0; // Reset retry count on success
     } catch (error: any) {
       // If the user doesn't exist, create it
@@ -49,12 +47,10 @@ export const initializeFirebase = async () => {
           error.code === 'auth/invalid-email') {
         try {
           await createUserWithEmailAndPassword(authInstance, HARDCODED_USER.email, HARDCODED_USER.password);
-          console.log('Hardcoded user created successfully');
           retryCount = 0; // Reset retry count on success
         } catch (createError: any) {
           // If the user already exists (e.g., email-already-in-use), that's also fine
           if (createError.code === 'auth/email-already-in-use') {
-            console.log('Hardcoded user already exists (email already in use)');
             retryCount = 0; // Reset retry count on success
           } else if (createError.code?.includes('api-key') || createError.code?.includes('invalid-argument')) {
             // Handle API key issues more gracefully
@@ -97,7 +93,6 @@ function incrementRetryCount() {
   retryCount++;
   if (retryCount < MAX_RETRIES) {
     const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
-    console.log(`Will retry Firebase initialization in ${delay}ms (attempt ${retryCount}/${MAX_RETRIES})`);
     setTimeout(() => {
       initializeFirebase();
     }, delay);

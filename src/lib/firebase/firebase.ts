@@ -30,17 +30,6 @@ const firebaseConfig = {
 // Check if using real config or fallback
 const isUsingRealConfig = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
-// Log configuration status (without exposing actual keys)
-console.log('Firebase config status:', {
-  usingRealConfig: isUsingRealConfig,
-  apiKeyProvided: !!firebaseConfig.apiKey,
-  authDomainProvided: !!firebaseConfig.authDomain,
-  projectIdProvided: !!firebaseConfig.projectId,
-  apiKeyLength: firebaseConfig.apiKey ? firebaseConfig.apiKey.length : 0,
-  environment: process.env.NODE_ENV,
-  isVercel: !!process.env.VERCEL
-});
-
 // Check if we're in a production or development environment
 const isVercel = !!process.env.VERCEL;
 const isProduction = process.env.NODE_ENV === 'production';
@@ -48,21 +37,10 @@ const isProduction = process.env.NODE_ENV === 'production';
 // Check if we're in a browser environment
 const isBrowser = typeof window !== 'undefined';
 
-// Log the deployment environment
-if (isBrowser) {
-  console.log('Environment:', {
-    isVercel,
-    isProduction,
-    hostname: window.location.hostname,
-    environment: process.env.NODE_ENV
-  });
-}
-
 // Override the auth domain for Vercel deployments
 if (isVercel && isBrowser && window.location.hostname !== 'localhost') {
   // In Vercel production, use the deployment URL as auth domain
   firebaseConfig.authDomain = window.location.hostname;
-  console.log('Set authDomain to:', window.location.hostname);
 }
 
 // Variables to hold our Firebase instances
@@ -109,19 +87,16 @@ export function getFirestoreInstance(): Firestore {
 export function initializeFirebase() {
   // Skip if not in browser
   if (!isBrowser) {
-    console.log('Skipping Firebase initialization in non-browser environment');
     return;
   }
 
   // Skip if already initialized
   if (firebaseApp && auth && db) {
-    console.log('Firebase already initialized');
     return;
   }
 
   // Initialize Firebase only if it hasn't been initialized already
   try {
-    console.log('Initializing Firebase...');
     firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     
     // Initialize Firebase services
@@ -154,7 +129,6 @@ export function initializeFirebase() {
       });
     }
     
-    console.log("Firebase initialized successfully in browser environment");
   } catch (error) {
     console.error("Firebase initialization error:", error);
     

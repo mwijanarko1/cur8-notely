@@ -27,7 +27,6 @@ export const startTokenExpiryTimer = (user: User | null) => {
 
   // Only set timer if there's an active user
   if (user) {
-    console.log('Starting token expiry timer for 15 minutes');
     updateLastActivity();
     
     // Check token validity every minute
@@ -35,15 +34,8 @@ export const startTokenExpiryTimer = (user: User | null) => {
       const currentTime = Date.now();
       const timeSinceLastActivity = currentTime - lastActivityTimestamp;
       
-      // Log time remaining (for debugging)
-      const timeRemaining = TOKEN_EXPIRATION - timeSinceLastActivity;
-      if (timeRemaining > 0) {
-        console.log(`Token expires in ${Math.round(timeRemaining / 1000)} seconds`);
-      }
-      
       // If inactive for TOKEN_EXPIRATION, sign out user
       if (timeSinceLastActivity >= TOKEN_EXPIRATION) {
-        console.log('Token expired due to inactivity - signing out user');
         signOut().catch(error => console.error('Error signing out after token expiry:', error));
         stopTokenExpiryTimer();
       }
@@ -62,7 +54,6 @@ export const stopTokenExpiryTimer = () => {
   if (tokenExpiryTimer) {
     clearInterval(tokenExpiryTimer);
     tokenExpiryTimer = null;
-    console.log('Token expiry timer stopped');
   }
 };
 
@@ -76,7 +67,6 @@ export const updateLastActivity = () => {
   }
 
   lastActivityTimestamp = Date.now();
-  console.log('Last activity timestamp updated');
 };
 
 /**
@@ -92,8 +82,6 @@ export const setupActivityListeners = () => {
   events.forEach(event => {
     window.addEventListener(event, () => updateLastActivity(), { passive: true });
   });
-  
-  console.log('User activity listeners set up');
 };
 
 /**

@@ -19,7 +19,6 @@ export default function FirebaseInitializer() {
   useEffect(() => {
     // Skip initialization if not in browser
     if (!isBrowser) {
-      console.log('Skipping Firebase initialization in non-browser environment');
       return;
     }
     
@@ -30,7 +29,6 @@ export default function FirebaseInitializer() {
         
         // Setup activity tracking for token expiration
         setupActivityListeners();
-        console.log(`Session will expire after ${TOKEN_EXPIRATION / 1000} seconds of inactivity`);
         
         setInitialized(true);
         setError(null);
@@ -44,7 +42,6 @@ export default function FirebaseInitializer() {
           
           // Retry with exponential backoff
           const delay = Math.pow(2, retryCount) * 1000;
-          console.log(`Retrying Firebase initialization in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})...`);
           
           setTimeout(() => {
             initialize();
