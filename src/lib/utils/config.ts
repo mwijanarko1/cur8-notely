@@ -1,19 +1,19 @@
-import getConfig from 'next/config';
-
 /**
- * Get server-side runtime config
- * @returns Server runtime configuration
+ * Get Gemini API key from environment
+ * @returns Gemini API key or empty string
  */
 export function getServerRuntimeConfig() {
-  const { serverRuntimeConfig } = getConfig();
-  return serverRuntimeConfig;
+  return {
+    geminiApiKey: process.env.GEMINI_API_KEY || '',
+  };
 }
 
 /**
- * Get public runtime config
- * @returns Public runtime configuration
+ * Get public configuration
+ * @returns Public configuration
  */
 export function getPublicRuntimeConfig() {
-  const { publicRuntimeConfig } = getConfig();
-  return publicRuntimeConfig;
-} 
+  return {
+    apiTimeout: 30000, // 30 seconds
+  };
+}
