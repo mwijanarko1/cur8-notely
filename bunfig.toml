@@ -1,0 +1,3 @@
+[install]
+# Matches former .npmrc legacy-peer-deps=true
+peer = false
