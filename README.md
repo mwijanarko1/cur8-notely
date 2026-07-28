@@ -31,7 +31,7 @@ A secure note-taking application with user authentication built with Next.js and
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 18+ and [Bun](https://bun.sh)
 - Firebase account
 - Google Gemini API key (for AI assistant features)
 
@@ -45,7 +45,7 @@ A secure note-taking application with user authentication built with Next.js and
 
 2. Install dependencies:
    ```bash
-   npm install
+   bun install
    ```
 
 3. Create a `.env.local` file in the root directory with your Firebase and Gemini API configuration:
@@ -65,7 +65,7 @@ A secure note-taking application with user authentication built with Next.js and
 
 4. Start the development server:
    ```bash
-   npm run dev
+   bun run dev
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
@@ -74,20 +74,20 @@ A secure note-taking application with user authentication built with Next.js and
 
 ```bash
 # Development
-npm run dev              # Start development server with Turbopack
+bun run dev              # Start development server with Turbopack
 
 # Building
-npm run build            # Create production build
-npm start                # Start production server
+bun run build            # Create production build
+bun run start                # Start production server
 
 # Code Quality
-npm run lint             # Run ESLint
+bun run lint             # Run ESLint
 
 # Testing
-npm test                 # Run all tests
-npm run test:watch       # Run tests in watch mode
-npm run test:coverage    # Run tests with coverage report
-npm run test:required    # Run required PRD tests (auth & notes)
+bun run test                 # Run all tests
+bun run test:watch       # Run tests in watch mode
+bun run test:coverage    # Run tests with coverage report
+bun run test:required    # Run required PRD tests (auth & notes)
 ```
 
 ### Firebase Setup
@@ -229,13 +229,13 @@ The application includes automated tests to verify key functionality:
 
 ```bash
 # Run all tests
-npm test
+bun run test
 
 # Run specific test files
-npm test -- -t "authentication"
+bun run test -- -t "authentication"
 
 # Run tests with coverage
-npm test -- --coverage
+bun run test -- --coverage
 ```
 
 ### Test Structure
